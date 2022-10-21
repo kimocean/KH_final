@@ -1,0 +1,88 @@
+<%@ page language="java" contentType="text/html; charset=UTF-8" pageEncoding="UTF-8" %>
+  <!DOCTYPE html>
+  <html>
+
+  <head>
+    <meta charset="UTF-8">
+    <title>옵션 리스트</title>
+    <script>
+      // 체크박스 전체 체크/해제
+      // function cb_selectAll(cb_selectAll) {
+      //   const cb_option = document.getElementsByName('cb_option');
+      //   document.getElementsByName
+      //   cb_option.forEach((checkbox) => {
+      //     checkbox.checked = cb_selectAll.checked;
+      //   })
+      // } // end of function cb_selectAll
+
+      // 체크박스 선택 삭제
+      $(function () {
+        var cb_option = document.getElementsByName("cb_option");
+        var cb_option_cnt = cb_option.length;
+
+      function b_checkDelete() {
+        var url = "delete";    // Controller로 보내고자 하는 URL
+        var valueArr = new Array();
+        var list = $("input[name='RowCheck']");
+        for (var i = 0; i < list.length; i++) {
+          if (list[i].checked) { //선택되어 있으면 배열에 값을 저장함
+            valueArr.push(list[i].value);
+          }
+        }
+        if (valueArr.length == 0) {
+          alert("선택된 글이 없습니다.");
+        }
+        else {
+          var chk = confirm("정말 삭제하시겠습니까?");
+          $.ajax({
+            url: url,                    // 전송 URL
+            type: 'POST',                // POST 방식
+            traditional: true,
+            data: {
+              valueArr: valueArr        // 보내고자 하는 data 변수 설정
+            },
+            success: function (jdata) {
+              if (jdata = 1) {
+                alert("삭제 성공");
+                location.replace("list") //list 로 페이지 새로고침
+              }
+              else {
+                alert("삭제 실패");
+              }
+            }
+          });
+        }
+      }
+    </script>
+  </head>
+
+  <body>
+    <table id="t_optionList" border="1">
+      <th><input type="checkbox" value="${list.option_no}"></th>
+      <th>옵션명</th>
+      <th>옵션값</th>
+      <th>옵션가</th>
+      <th>재고수량</th>
+      <c:forEach items="${optionSelectAll}" var="list">
+        <tr>
+          <td><input type="checkbox" name="cb_option"></td>
+          <td>
+            <c:out value="${list.option_name}" />
+          </td>
+          <td>
+            <c:out value="${list.option_value}" />
+          </td>
+          <td>
+            <c:out value="${list.option_price}" />
+          </td>
+          <td>
+            <c:out value="${list.option_stock}" />
+          </td>
+        </tr>
+      </c:forEach>
+    </table>
+    <a href="/product/optioninsert">등록</a>
+    <input type="button" value="삭제" onclick="b_checkDelete()">
+  </body>
+
+  </html>
