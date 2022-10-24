@@ -36,4 +36,8 @@
 	delete from product
 	where product_no = #{product_no}
 </delete>
+<select id="selectCategoryType">
+	select category_type_no, category_type_name
+	from category_type
+</select>
 </mapper>

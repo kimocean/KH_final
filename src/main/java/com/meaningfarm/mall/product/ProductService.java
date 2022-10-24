@@ -31,17 +31,27 @@ public class ProductService {
 	
 	public int productInsert(ProductVO productVO) {
 		logger.info("ProductService productInsert");
-		int result = productDAO.productInsert(productVO);
 		// if문을 vo.set~~을 0으로
+		if(productVO.getOption_no() == null) {
+			productVO.setOption_no(0);
+		}
+		if(productVO.getProduct_dlvyfee() == null) {
+			productVO.setProduct_dlvyfee(0);
+		}
+		int result = productDAO.productInsert(productVO);
+		logger.info("ProductService productInsert result" + productVO);
+		int str = productVO.getOption_no();
 		logger.info("result " + result);
 		return result;
 	}
 	
 	public void productUpdate(ProductVO productVO) {
+		logger.info("ProductService productUpdate " + productVO);
 		productDAO.productUpdate(productVO);
 	}
 	
 	public void productDelete(int product_no) {
+		logger.info("ProductService productDelete " + product_no);
 		productDAO.productDelete(product_no);
 	}
 	
@@ -59,14 +69,31 @@ public class ProductService {
 //		return optionList;
 //	}
 	
+	public OptionVO optionDetail(int option_no) {
+		logger.info("ProductService optionDetail");
+		OptionVO optionDetail = productDAO.optionDetail(option_no);
+		return optionDetail;
+	}
+	
 	public int optionInsert(OptionVO optionVO) {
 		logger.info("ProductService optionInsert");
 		int result = productDAO.optionInsert(optionVO);
 		return result;
 	}
 	
+	public void optionUpdate(OptionVO optionVO) {
+		logger.info("ProductService optionUpdate " + optionVO);
+		productDAO.optionUpdate(optionVO);
+	}
+	
 	public void optionDelete(int option_no) {
 		logger.info("ProductService optionDelete " + option_no);
 		productDAO.optionDelete(option_no);
 	}
+
+	public void optionCheckDelete(int option_no) {
+		logger.info("ProductService optionDelete " + option_no);
+		productDAO.optionDelete(option_no);
+	}
+
 }

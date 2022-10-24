@@ -29,6 +29,7 @@ public class ProductDAO {
 	}
 	
 	public int productInsert(ProductVO productVO) {
+		logger.info("ProductDAO productInsert");
 		int result = 0;
 		result = sst.insert("productInsert", productVO);
 		logger.info("ProductDAO productInsert result " + result);
@@ -36,10 +37,12 @@ public class ProductDAO {
 	}
 	
 	public void productUpdate(ProductVO productVO) {
+		logger.info("ProductDAO productUpdate " + productVO);
 		sst.update("productUpdate", productVO);
 	}
 	
 	public void productDelete(int product_no) {
+		logger.info("ProductService productDelete " + product_no);
 		sst.delete("productDelete", product_no);
 	}
 	
@@ -56,12 +59,22 @@ public class ProductDAO {
 //		optionList = sst.selectList("optionSelectAll", optionListMap); // 여기 앞에는 xml name 적기
 //		return optionList;
 //	}
+	
+	public OptionVO optionDetail(int option_no) {
+		logger.info("ProductDAO optionDetail option_no " + option_no);
+		return sst.selectOne("optionSelectOne", option_no);
+	}
 
 	public int optionInsert(OptionVO optionVO) {
 		int result = 0;
 		result = sst.insert("optionInsert", optionVO);
 		logger.info("ProductDAO optionInsert result " + result);
 		return result;
+	}
+	
+	public void optionUpdate(OptionVO optionVO) {
+		logger.info("ProductDAO optionUpdate " + optionVO);
+		sst.update("optionUpdate", optionVO);
 	}
 	
 	public void optionDelete(int option_no) {

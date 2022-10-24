@@ -8,7 +8,7 @@
 <%@ include file="../../../common/common.jsp" %>
 </head>
 <body>
-    <form action="/product/optioninsert" method="post">
+    <form action="/mall/product/optioninsert" method="post">
         <table border="1">
           <th>옵션명</th>
           <th>옵션값</th>
@@ -21,8 +21,7 @@
             <td><input type="text" name="option_stock"></td>
           </tr>
         </table>
-        옵션번호 <input type="text" name="option_no">
-        상품번호 <input type="text" name="product_no">
+        옵션번호 <input type="text" name="option_no" value="${optionSelectOne.option_no}">
         <br/>
         <button type="submit">추가</button>
       <!--   <button type="button">추가</button> -->

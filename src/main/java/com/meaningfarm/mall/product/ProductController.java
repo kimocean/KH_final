@@ -1,5 +1,9 @@
 package com.meaningfarm.mall.product;
 
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -8,6 +12,7 @@ import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 
 @Controller
 @RequestMapping("/product/*")
@@ -23,12 +28,12 @@ public class ProductController {
 //		logger.info("게시판 목록");
 //	}
 	// product 상품 목록 페이지 띄우기
-	@GetMapping("/productlist")
+	@GetMapping("/productlisttest")
 	public String productList(Model model) {
 		logger.info("ProductController productList");
 		model.addAttribute("productSelectAll", productService.productList());
 		logger.info(productService.productList().toString());
-		return "product/productlist";
+		return "product/productlisttest";
 	}
 	// product 상품 등록 창 띄우기
 	@GetMapping("/productinsert")
@@ -40,7 +45,7 @@ public class ProductController {
 	public String productInsert(ProductVO productVO) {
 		logger.info("글 작성 버튼 누름 ProductVO " + productVO);
 		productService.productInsert(productVO);
-		return "redirect:/product/productlist";
+		return "redirect:/product/productlisttest";
 	}
 	// product 상품 상세 창으로 가는 거
 	@GetMapping("/productdetail")
@@ -68,6 +73,9 @@ public class ProductController {
 	public String optionPopup() {
 		return "product/optionpopup";
 	}
+	
+	///////////////////////////////////////////////////////////////////////
+	
 	// option 목록 창으로 이동
 	@GetMapping("/optionlist")
 	public String optionList(Model model) {
@@ -97,11 +105,35 @@ public class ProductController {
 		productService.optionInsert(optionVO);
 		return "redirect:/product/optionpopup";
 	}
+	// option 옵션 상세 창으로 가는 거
+	@GetMapping("/optiondetail")
+	public String optionDetail(OptionVO optionVO, Model model) {
+		logger.info("ProductController optionDetail");
+		model.addAttribute("optionSelectOne", productService.optionDetail(optionVO.getOption_no()));
+		return "product/optiondetail";
+	}
+	// option 상품 수정
+	@PostMapping("/optiondetail")
+	public String optionUpdate(OptionVO optionVO) {
+		logger.info("ProductController optionUpdate " + optionVO);
+		productService.optionUpdate(optionVO);
+		return "redirect:/product/optionpopup";
+	}
 	// option 옵션 삭제
 	@PostMapping("/optiondelete")
 	public String optionDelete(OptionVO optionVO) {
 		logger.info("ProductController optionDelete " + optionVO);
 		productService.optionDelete(optionVO.getOption_no());
+		return "redirect:/product/optionpopup";
+	}
+	// option 옵션 선택 삭제
+	@PostMapping("/optioncheckdelete")
+	public String optionCheckDelete(@RequestParam(value="option_nos", required=false) String option_nos, Model model) {
+		List<String> optionCheckList = null;
+		optionCheckList = new ArrayList<String>(Arrays.asList(option_nos.split(",")));
+		for(String option_no : optionCheckList) {
+			productService.optionDelete(Integer.parseInt(option_no));
+		}
 		return "redirect:/product/optionpopup";
 	}
 }

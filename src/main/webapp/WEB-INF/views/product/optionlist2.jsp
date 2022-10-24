@@ -21,7 +21,7 @@
 
 <body>
 	<table id="t_optionList" border="1">
-		<th><input type="checkbox" name="cb_option" value="${list.option_no}"></th>
+		<th><input type="checkbox" name="cb_option" value="<c:out value="${list.option_no}" />"></th>
 		<th>옵션명</th>
 		<th>옵션값</th>
 		<th>옵션가</th>
@@ -36,7 +36,7 @@
 			</tr>
 		</c:forEach>
 	</table>
-	<a href="/product/optioninsert">등록</a>
+	<a href="/mall/product/optioninsert">등록</a>
 	<input type="button" value="삭제" onclick="b_checkDelete()">
 </body>
 

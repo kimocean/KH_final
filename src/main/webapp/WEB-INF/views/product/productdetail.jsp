@@ -4,16 +4,16 @@
 <html>
 <head>
 <meta charset="UTF-8">
-<title>write</title>
+<title>detail</title>
 </head>
 <body>
 <%@ include file="../../../common/common.jsp" %>
 <script type="text/javascript">
 	// 옵션 팝업창 띄우기
 	function optionPopup() {
-		const url = "/product/optionpopup"
+		const url = "./optionpopup"
 		const name = "OptionPopup"
-		const option = "width=500, height=500, top=100, left=200, location=no";
+		const option = "width=800, height=500, top=100, left=200, location=no";
 		window.open(url, name, option)
 	}
 	$(document).ready(function(){
@@ -28,23 +28,7 @@
 	        }
 	    });
 	// 
-	    $('input[name="dlvyfee_radio"]').on('click', function(){
-	    	  let dlvyfee_radio = $('input[name="dlvyfee_radio"]:checked').val();
-	    	  if(dlvyfee_radio == "dlvyfee_s"){
-	    	  console.log(dlvyfee_radio);
-	    		  $('#tb_dlvyfee_o').css('display','none');
- 	             $('#tb_dlvyfee_s').css('display','block');
-	    	  }else if(dlvyfee_radio == "dlvyfee_o"){
-	    	  console.log(dlvyfee_radio);
-	    	             $('#tb_dlvyfee_o').css('display','block');
-	    	             $('#tb_dlvyfee_s').css('display','none');
-	    	  }else{
-	    	  console.log(dlvyfee_radio);
-	    		  $('#tb_dlvyfee_o').css('display','none');
- 	             $('#tb_dlvyfee_s').css('display','none');
-	    	  }
-	    	 
-	    	});
+
 	    let productForm = $("form[name='f_product']");
 		// 수정 
 //		$("#b_update").on("click", function(){
@@ -54,14 +38,75 @@
 //		})
 		// 삭제
 		$("#b_delete").on("click", function(){
-			productForm.attr("action", "/product/productdelete");
+			productForm.attr("action", "./productdelete");
 			productForm.attr("method", "post");
 			productForm.submit();
 		})
+		// 옵션 라디오박스 체크
+		const option_no = document.getElementById("option_no").value;
+		if(option_no == 0) {
+			$(":radio[name='option_radio'][value='option_x']").attr('checked', true);
+		} else {
+			$(":radio[name='option_radio'][value='option_o']").attr('checked', true);
+		}
+		
+		// 배송비 라디오 버튼 적용
+		const product_dlvyfee = document.getElementsByName("product_dlvyfee")[0].value;
+		console.log(product_dlvyfee);
+		
+		if(product_dlvyfee == 0) {
+			$(":radio[name='dlvyfee_radio'][value='dlvyfee_x']").attr('checked', true);
+		} else if (product_dlvyfee < 0) {
+			$(":radio[name='dlvyfee_radio'][value='dlvyfee_s']").attr('checked', true);
+		} else {
+			$(":radio[name='dlvyfee_radio'][value='dlvyfee_o']").attr('checked', true);
+		}
+		
+		// 배송비 텍스트박스 띄우기
+	    	  let dlvyfee_radio = $('input[name="dlvyfee_radio"]:checked').val();
+	    	  if(dlvyfee_radio == "dlvyfee_s"){
+	    	  console.log(dlvyfee_radio);
+	    		  $('#tb_dlvyfee_o').css('display','none');
+	             $('#tb_dlvyfee_s').css('display','block');
+	             $("[name='product_dlvyfee']").val($("[name='product_dlvyfee']").val() * -1)
+	    	  }else if(dlvyfee_radio == "dlvyfee_o"){
+	    	  console.log(dlvyfee_radio);
+	    	             $('#tb_dlvyfee_o').css('display','block');
+	    	             $('#tb_dlvyfee_s').css('display','none');
+	    	  }else{
+	    	  console.log(dlvyfee_radio);
+	    		  $('#tb_dlvyfee_o').css('display','none');
+	             $('#tb_dlvyfee_s').css('display','none');
+	    	  }
+	    	 
+	    	  // 배송비 박스 선택하는 대로 변경
+	  	    $('input[name="dlvyfee_radio"]').on('click', function(){
+		    	  let dlvyfee_radio = $('input[name="dlvyfee_radio"]:checked').val();
+		    	  if(dlvyfee_radio == "dlvyfee_s"){
+		    	  console.log(dlvyfee_radio);
+		    		  $('#tb_dlvyfee_o').css('display','none');
+	 	             $('#tb_dlvyfee_s').css('display','block');
+		    	  }else if(dlvyfee_radio == "dlvyfee_o"){
+		    	  console.log(dlvyfee_radio);
+		    	             $('#tb_dlvyfee_o').css('display','block');
+		    	             $('#tb_dlvyfee_s').css('display','none');
+		    	  }else{
+		    	  console.log(dlvyfee_radio);
+		    		  $('#tb_dlvyfee_o').css('display','none');
+	 	             $('#tb_dlvyfee_s').css('display','none');
+		    	  }
+		    	});
+	    	  
+	    	  
+			if($(":radio[name='dlvyfee_radio'][value='dlvyfee_s']").attr('checked', true)) {
+				document.getElementsByName("product_dlvyfee")[0].value *= -1;
+			}
+	    // 배송비 음수 체크
+		
 	}); // end of document ready
 </script>
 <h1>상품 상세</h1>
-<form action="/product/productdetail?product_no=${productSelectOne.product_no}" method="post" name="f_product"> <br/>
+<form action="/mall/product/productdetail?product_no=${productSelectOne.product_no}" method="post" name="f_product"> <br/>
 product_no : <input type="text" name="product_no" value="${productSelectOne.product_no}"> <br/>
 상품명 : <input type="text" name="product_name" value="${productSelectOne.product_name}"> <br/>
 카테고리(지역) :  <input type="text" name="category_local_no" value="${productSelectOne.category_local_no}">
@@ -74,7 +119,7 @@ product_no : <input type="text" name="product_no" value="${productSelectOne.prod
 <input type="radio" name="option_radio" value="option_x"> 설정 안 함 
 <input type="radio" name="option_radio" value="option_o"> 설정함
 <input type="button" id="b_optionpopup" name="b_optionpopup" value="옵션 설정" onclick="optionPopup()" disabled /> 
-<input type="text" name="option_no"  value="${productSelectOne.option_no}"><br/>
+<input type="hidden" name="option_no" id="option_no" value="${productSelectOne.option_no}"><br/>
 재고 : <input type="text" name="product_stock"  value="${productSelectOne.product_stock}"> <br/>
 대표이미지 : 첨부파일 <input type="text" name="product_img"  value="${productSelectOne.product_img}"> <br/>
 배송비 :

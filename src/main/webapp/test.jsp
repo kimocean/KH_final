@@ -4,11 +4,9 @@
 <html>
 <head>
 <meta charset="UTF-8">
-<title>옵션 팝업</title>
-<%@ include file="../../../common/common.jsp" %>
+<title>Insert title here</title>
 </head>
 <body>
-<jsp:include page="./optioninsert.jsp" flush="false" />
-<c:import url="/product/optionlist" />
+test
 </body>
 </html>
