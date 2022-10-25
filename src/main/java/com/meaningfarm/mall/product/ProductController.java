@@ -14,6 +14,9 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
+
 @Controller
 @RequestMapping("/product/*")
 public class ProductController {
@@ -135,5 +138,18 @@ public class ProductController {
 			productService.optionDelete(Integer.parseInt(option_no));
 		}
 		return "redirect:/product/optionpopup";
+	}
+	
+	
+	
+	@GetMapping("/optioncategory")
+	public void optionCategory(Model model) throws Exception {
+		logger.info("productController optionCategory");
+		ObjectMapper objm = new ObjectMapper();
+		List list = productService.optionList();
+		String optionCategoryList = objm.writeValueAsString(list); // java 객체를 string 타입의 json 형식 데이터로 변환
+		model.addAttribute("optionSelectAll", optionCategoryList);
+		logger.info("list " + list);
+		logger.info("optionCategoryList " + optionCategoryList);
 	}
 }
