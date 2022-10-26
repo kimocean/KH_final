@@ -38,6 +38,9 @@
 	<select class="cate1">
 		<option selected>선택</option>
 	</select>
+	<select class="cate2">
+		<option selected>선택</option>
+	</select>
 </div>
 </body>
 </html>

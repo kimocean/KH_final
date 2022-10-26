@@ -32,15 +32,11 @@ public class ProductService {
 	public int productInsert(ProductVO productVO) {
 		logger.info("ProductService productInsert");
 		// if문을 vo.set~~을 0으로
-		if(productVO.getOption_no() == null) {
-			productVO.setOption_no(0);
-		}
 		if(productVO.getProduct_dlvyfee() == null) {
 			productVO.setProduct_dlvyfee(0);
 		}
 		int result = productDAO.productInsert(productVO);
 		logger.info("ProductService productInsert result" + productVO);
-		int str = productVO.getOption_no();
 		logger.info("result " + result);
 		return result;
 	}
@@ -94,6 +90,20 @@ public class ProductService {
 	public void optionCheckDelete(int option_no) {
 		logger.info("ProductService optionDelete " + option_no);
 		productDAO.optionDelete(option_no);
+	}
+	
+	
+	
+	public List<CategoryTypeVO> CTList() {
+		List<CategoryTypeVO> CTList = null;
+		CTList = productDAO.CTList();
+		return CTList;
+	}
+
+	public List<CategoryLocalVO> CLList() {
+		List<CategoryLocalVO> CLList = null;
+		CLList = productDAO.CLList();
+		return CLList;
 	}
 
 }

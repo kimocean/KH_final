@@ -24,7 +24,6 @@ public class ProductDAO {
 	
 	public ProductVO productDetail(int product_no) {
 		logger.info("ProductDAO productDetail product_no " + product_no);
-//		ProductVO productDetail = 
 		return sst.selectOne("productSelectOne", product_no);
 	}
 	
@@ -82,4 +81,19 @@ public class ProductDAO {
 		sst.delete("optionDelete", option_no);
 	}
 	
+	
+	
+	
+	public List<CategoryLocalVO> CLList() {
+		List<CategoryLocalVO> CLList = null;
+		CLList = sst.selectList("selectCategoryLocal");
+		return CLList;
+	}
+	
+	public List<CategoryTypeVO> CTList() {
+		List<CategoryTypeVO> CTList = null;
+		CTList = sst.selectList("selectCategoryType");
+		return CTList;
+		
+	}
 }
