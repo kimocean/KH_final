@@ -50,11 +50,6 @@ public class ProductController {
 		logger.info(productService.productList().toString());
 		return "product/productlisttest";
 	}
-	// product 상품 등록 창 띄우기
-//	@GetMapping("/productinsert")
-//	public void productInsert() {
-//		logger.info("글 작성");
-//	}
 	// product 상품 등록 버튼 누를 때
 	@PostMapping("/productinsert")
 	public String productInsert(ProductVO productVO) {
@@ -114,7 +109,6 @@ public class ProductController {
 //	}
 	
 	@PostMapping(value="/productfileinsert", produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
-//	public void insertImg(@RequestParam(value="uploadImg") MultipartFile uploadImg) {
 	public ResponseEntity<List<ProductFileVO>> productfileInsert(@RequestParam(value="uploadImg") MultipartFile[] uploadImg) {
 		logger.info("ProductController productfileInsert");
 		System.out.println(uploadImg.length);
@@ -189,7 +183,7 @@ public class ProductController {
 			}
 			int i = 0;
 			System.out.println(++i);
-//				productService.productfileInsert(productfileVO);
+//			productService.productfileInsert(productfileVO);
 			PFList.add(productfileVO);
 			System.out.println("PFList " + PFList);
 			System.out.println(PFList.size());

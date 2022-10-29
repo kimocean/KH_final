@@ -22,16 +22,7 @@
 
 판매가격 : <input type="text" name="product_price"> <br/>
 재고 : <input type="text" name="product_stock"> <br/>
-이미지 첨부 : 
-<div class="form_section">
-	<div class="form_section_title">
-		<label>상품 이미지</label>
-	</div>
-	<div class="form_section_content">
-		<input type="file" name="product_img" id="product_img" multiple> <br/>
-	</div>
-</div>
-
+이미지 첨부 : <input type="file" name="product_img" id="product_img" accept="image/*" multiple> <br/>
 <div id="uploadResult">
 </div>
 배송비 :
@@ -104,116 +95,117 @@ $(document).ready(function() {
 	
 }); // end of document ready
 
-// 이미지 업로드
-	$("input[type='file']").on("change", function(e){
+	//이미지 업로드
+	let formData = new FormData();
+	$("input[type='file']").on("change", function(e) {
 		
-//		for(let i=0;i<)
-		let formData = new FormData();
-		let fileInput = $('input[name="product_img"]');
-		let fileList = fileInput[0].files;
-		let fileObj = fileList[0];
+		let img = $("input[name='product_img']");
+		let imgList = img[0].files;
+		let imgObj = imgList[0];
 		
-		console.log(formData);
-		console.log(fileInput);
-		console.log(fileList);
-		console.log(fileObj);
-		console.log("fileName : " + fileObj.name);
-		console.log("fileSize : " + fileObj.size);
-		console.log("fileType(MimeType) : " + fileObj.type);
-		
-		if(!fileCheck(fileObj.name, fileObj.size)) {
+		if(!imgCheck(imgObj.name, imgObj.size)) {
+			console.log(imgObj.name, imgObj.size)
 			return false;
 		}
-//		alert("통과");
-		console.log("fileList length " + fileList.length);
-		for(let i=0;i<fileList.length;i++) {
-			formData.append("uploadImg", fileList[i]);
+		alert("통과");
+		
+		for(let i=0;i<imgList.length;i++) {
+			formData.append("uploadImg", imgList[i]);
 		}
+	
 		
 		$.ajax({
 			url: 'productfileinsert',
+			enctype: 'multipart/form-data',
 			processData: false,
 			contentType: false,
 			data: formData,
 			type: 'POST',
-			dataType: 'json'
-		})
-	});
-		
-	/* var, method related with attachFile */
-	let regex = new RegExp("(.*?)\.(jpg|png|JPG|PNG)$");
-	let maxSize = 1048576; //1MB	
+			dataType: 'json',
+			success: function(result) {
+				console.log(result);
+				showUploadImage(result);
+			},
+			error: function(error) {
+				alert("이미지 파일이 아닙니다.")
+			}
+		});
+		console.log(imgList);
+		console.log(imgObj);
+	}) // end of input type file change
 	
-	function fileCheck(fileName, fileSize){
-		if(fileSize >= maxSize){
+	let regex = new RegExp("(.*?)\.(jpg|png|gif|JPG|PNG|GIF)$"); // 파일 형식 제한
+	let maxSize = 10485760000; // 파일 용량 제한
+	
+	function imgCheck(imgName, imgSize) {
+		if(imgSize >= maxSize) {
 			alert("파일 사이즈 초과");
 			return false;
 		}
-		if(!regex.test(fileName)){
-			alert("해당 종류의 파일은 업로드할 수 없습니다.");
+		if(!regex.test(imgName)) {
+			alert("업로드할 수 없는 파일 형식");
 			return false;
 		}
-		return true;		
-	}	
+		return true;
+	}
 	
+	// 이미지 출력
+	function showUploadImage(uploadResultArr) {
+		if(!uploadResultArr || uploadResultArr.length == 0) { alert("showUploadImage 오류"); return }
+		for(let i=0;i<uploadResultArr.length;i++) {
+			let uploadResult = $("#uploadResult");
+			let obj = uploadResultArr[i];
+			let str = "";
+		//	let imsi = obj.productfile_path.replace(/\\/g, '/').indexOf('resource');
+		//	let imsi2 = obj.productfile_path.replace(/\\/g, '/').slice(imsi);
+		//	let fileCallPath = imsi2 + "/s_" + obj.productfile_name;
+			let imsi = obj.productfile_path.replace(/\\/g, '/').indexOf('20');
+			let imsi2 = obj.productfile_path.replace(/\\/g, '/').slice(imsi);
+			let fileCallPath = imsi2 + "/s_" + obj.productfile_name;
+		//	let fileCallPath = obj.productfile_path.replace(/\\/g, '/') + "/s_" + obj.productfile_name;
+			console.log(fileCallPath)
+			
+			str += "<div id='result_card'>";
+			str += "<img src='productfiledetail?imgName=" + fileCallPath + "'>";
+		//	str += "<img src='/mall/" + fileCallPath + "'>";
+			str += "<div class='imgDeleteBtn' data-file='" + fileCallPath + "'>x</div>";
+			str += "</div>"
+			str += "<input type='hidden' name='productfileVO[" + i + "].productfile_name' value='"+ obj.productfile_name +"'>";
+			str += "<input type='hidden' name='productfileVO[" + i + "].productfile_sname' value='"+ obj.productfile_sname +"'>";
+			str += "<input type='hidden' name='productfileVO[" + i + "].productfile_path' value='"+ obj.productfile_path +"'>";
+			
+			uploadResult.append(str);
+		} // end for for
+		
+	}
 	
-	/* 이미지 출력 */
-	function showUploadImage(uploadResultArr){
-		
-		/* 전달받은 데이터 검증 */
-		if(!uploadResultArr || uploadResultArr.length == 0){return}
-		
-		let uploadResult = $("#uploadResult");
-		
-		let obj = uploadResultArr[0];
-		
-		let str = "";
-		
-		let fileCallPath = encodeURIComponent(obj.uploadPath.replace(/\\/g, '/') + "/s_" + obj.uuid + "_" + obj.fileName);
-		//replace 적용 하지 않아도 가능
-		//let fileCallPath = encodeURIComponent(obj.uploadPath + "/s_" + obj.uuid + "_" + obj.fileName);
-		
-		str += "<div id='result_card'>";
-		str += "<img src='/display?fileName=" + fileCallPath +"'>";
-		str += "<div class='imgDeleteBtn' data-file='" + fileCallPath + "'>x</div>";
-		str += "<input type='hidden' name='fileList[0].productfile_name' value='"+ obj.productfile_name +"'>";
-		str += "<input type='hidden' name='fileList[0].productfile_sname' value='"+ obj.productfile_sname +"'>";
-		str += "<input type='hidden' name='fileList[0].productfile_path' value='"+ obj.productfile_path +"'>";		
-		str += "</div>";		
-   		uploadResult.append(str);     
-	}	
-	
-	/* 이미지 삭제 버튼 동작 */
-	$("#uploadResult").on("click", ".imgDeleteBtn", function(e){
-		deleteFile();
+	// imgdeletebtn.click 사용 안 하는 이유는 div 태그가 웹 페이지 렌더링 이후 자스 코드를 통해 출력된 거라(동적 출력)
+	$("#uploadResult").on("click", ".imgDeleteBtn", function(e) {
+		deleteImg();	
 	});
 	
-	/* 파일 삭제 메서드 */
-	function deleteFile(){
-		
-		let targetFile = $(".imgDeleteBtn").data("file");
-		
+	// 파일 삭제
+	function deleteImg() {
+		let targetImg = $(".imgDeleteBtn").data("file");
 		let targetDiv = $("#result_card");
 		
 		$.ajax({
 			url: 'productfiledelete',
-			data : {fileName : targetFile},
-			dataType : 'text',
-			type : 'POST',
-			success : function(result){
-				console.log(result);
-				
-				targetDiv.remove();
+			data: {imgName : targetImg},
+			dataType: 'text',
+			type: 'POST',
+			success: function(result) {
+				console.log(result + " 삭제 완료");
+				targetDiv.remove()
 				$("input[type='file']").val("");
-				
 			},
-			error : function(result){
-				console.log(result);
-				
-				alert("파일을 삭제하지 못하였습니다.")
+			error: function(error) {
+				console.log(error);
+				alert("파일 삭제 실패");
 			}
-		});
+		})
 	}
+
 
 $("#b_submit").on("click", function(e) {
 	e.preventDefault();

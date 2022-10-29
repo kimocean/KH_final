@@ -18,7 +18,7 @@ public class ProductVO {
 	private int category_type_no = 0;
 //	private Integer option_no = 0;
 	private String m_id = "";
-	private List<ProductFileVO> productfileVO;
+	private List<ProductFileVO> productfileVO = null;
 //	public int getProduct_no() {
 //		return product_no;
 //	}

@@ -15,7 +15,7 @@
 </select>
 <insert id="productInsert">
 	<selectKey resultType="int" keyProperty="product_no" order="BEFORE">
-		select max(product_no)+1 from dual
+		select SEQ_PRODUCT_NO.nextval from dual
 	</selectKey>
 	insert into product(product_no, product_name, product_price, product_detail, product_stock,
 						product_dlvyfee, product_dlvylimit, category_local_no, category_type_no, m_id)

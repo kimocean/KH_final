@@ -6,6 +6,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 
 @Service
@@ -30,15 +31,23 @@ public class ProductService {
 		return productDetail;
 	}
 	
-	public void productInsert(ProductVO productVO) {
+	public int productInsert(ProductVO productVO) {
 		logger.info("ProductService productInsert");
 		// if문을 vo.set~~을 0으로
 		if(productVO.getProduct_dlvyfee() == null) {
 			productVO.setProduct_dlvyfee(0);
 		}
-		productDAO.productInsert(productVO);
+//		if(productVO.getProductfileVO() == null || productVO.getProductfileVO().size() <= 0) {
+//			return productVO.setProductfileVO(0);
+//		}
+		int result = 0;
+		result = productDAO.productInsert(productVO);
+		productVO.getProductfileVO().forEach(productfileVO -> {
+			productfileVO.setProduct_no(productVO.getProduct_no());
+			productDAO.productfileInsert(productfileVO);
+		});
 		logger.info("ProductService productInsert result" + productVO);
-		
+		return result;
 	}
 	
 	public void productUpdate(ProductVO productVO) {
@@ -72,13 +81,13 @@ public class ProductService {
 //		return PFList;
 //	}
 
-	public int productfileInsert(ProductFileVO productfileVO) {
-		logger.info("ProductService productfileInsert");
-		int result = productDAO.productfileInsert(productfileVO);
-		logger.info("ProductService productfileInsert result" + productfileVO);
-		logger.info("result " + result);
-		return result;
-	}
+//	public int productfileInsert(ProductFileVO productfileVO) {
+//		logger.info("ProductService productfileInsert");
+//		int result = productDAO.productfileInsert(productfileVO);
+//		logger.info("ProductService productfileInsert result" + productfileVO);
+//		logger.info("result " + result);
+//		return result;
+//	}
 
 	public void productfileDelete(int productfile_no) {
 		logger.info("ProductService productfileDelete " + productfile_no);
