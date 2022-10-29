@@ -9,14 +9,17 @@
 </select>
 <select id="productSelectOne" parameterType="int" resultType="com.meaningfarm.mall.product.ProductVO">
 	select product_no, product_name, product_price, product_detail,
-		   product_stock, product_img, product_dlvyfee, product_dlvylimit, category_local_no, category_type_no, m_id
+		   product_stock, product_dlvyfee, product_dlvylimit, category_local_no, category_type_no, m_id
 	from product
 	where product_no = #{product_no}
 </select>
 <insert id="productInsert">
-	insert into product(product_no, product_name, product_price, product_detail, product_stock, product_img,
+	<selectKey resultType="int" keyProperty="product_no" order="BEFORE">
+		select max(product_no)+1 from dual
+	</selectKey>
+	insert into product(product_no, product_name, product_price, product_detail, product_stock,
 						product_dlvyfee, product_dlvylimit, category_local_no, category_type_no, m_id)
-	values(#{product_no}, #{product_name}, #{product_price}, #{product_detail}, #{product_stock}, #{product_img},
+	values(#{product_no}, #{product_name}, #{product_price}, #{product_detail}, #{product_stock},
 		   #{product_dlvyfee}, #{product_dlvylimit}, #{category_local_no}, #{category_type_no}, #{m_id})
 </insert>
 <update id="productUpdate" parameterType="com.meaningfarm.mall.product.ProductVO">
@@ -25,7 +28,6 @@
 		 , product_price = #{product_price}
 		 , product_detail = #{product_detail}
 		 , product_stock = #{product_stock}
-		 , product_img = #{product_img}
 		 , product_dlvyfee = #{product_dlvyfee}
 		 , product_dlvylimit = #{product_dlvylimit}
 		 , category_local_no = #{category_local_no}
@@ -36,5 +38,18 @@
 <delete id="productDelete" parameterType="int">
 	delete from product
 	where product_no = #{product_no}
+</delete>
+
+<select id="productfileSelect" resultType="com.meaningfarm.mall.product.ProductFileVO">
+	select * from productfile2
+	where product_no = #{product_no}
+</select>
+<insert id="productfileInsert" parameterType="com.meaningfarm.mall.product.ProductFileVO">
+	insert into productfile2
+	values(seq_productfile_no.nextval, #{productfile_name}, #{productfile_sname}, #{productfile_path}, #{product_no})
+</insert>
+<delete id="productfileDelete" parameterType="int">
+	delete from productfile2
+	where productfile_no = #{productfile_no}
 </delete>
 </mapper>

@@ -45,42 +45,6 @@ public class ProductDAO {
 		sst.delete("productDelete", product_no);
 	}
 	
-	public List<OptionVO> optionList() {
-		List<OptionVO> optionList = null;
-		optionList = sst.selectList("optionSelectAll");
-		logger.info("ProductDAO optionList " + optionList);
-		return optionList;
-	}
-	
-//	public List<Map<String, Object>> optionList(Map<String, Object> optionListMap) {
-//		logger.info("ProductDAO optionList");
-//		List<Map<String, Object>> optionList = null;
-//		optionList = sst.selectList("optionSelectAll", optionListMap); // 여기 앞에는 xml name 적기
-//		return optionList;
-//	}
-	
-	public OptionVO optionDetail(int option_no) {
-		logger.info("ProductDAO optionDetail option_no " + option_no);
-		return sst.selectOne("optionSelectOne", option_no);
-	}
-
-	public int optionInsert(OptionVO optionVO) {
-		int result = 0;
-		result = sst.insert("optionInsert", optionVO);
-		logger.info("ProductDAO optionInsert result " + result);
-		return result;
-	}
-	
-	public void optionUpdate(OptionVO optionVO) {
-		logger.info("ProductDAO optionUpdate " + optionVO);
-		sst.update("optionUpdate", optionVO);
-	}
-	
-	public void optionDelete(int option_no) {
-		logger.info("ProductService optionDelete " + option_no);
-		sst.delete("optionDelete", option_no);
-	}
-	
 	
 	
 	
@@ -95,5 +59,24 @@ public class ProductDAO {
 		CTList = sst.selectList("selectCategoryType");
 		return CTList;
 		
+	}
+	
+	public List<ProductFileVO> productfileList(ProductFileVO productfileVO) {
+		List<ProductFileVO> PFList = null;
+		PFList = sst.selectList("productfileSelect");
+		return PFList;
+	}
+	
+	public int productfileInsert(ProductFileVO productfileVO) {
+		logger.info("ProductDAO productfileInsert");
+		int result = 0;
+		result = sst.insert("productfileInsert", productfileVO);
+		logger.info("ProductDAO productfileInsert result " + result);
+		return result;
+	}
+
+	public void productfileDelete(int productfile_no) {
+		logger.info("ProductService productfileDelete " + productfile_no);
+		sst.delete("productfileDelete", productfile_no);
 	}
 }

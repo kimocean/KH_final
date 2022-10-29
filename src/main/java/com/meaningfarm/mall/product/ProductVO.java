@@ -1,5 +1,7 @@
 package com.meaningfarm.mall.product;
 
+import java.util.List;
+
 import lombok.Data;
 
 @Data
@@ -10,13 +12,13 @@ public class ProductVO {
 	private int product_price = 0;
 	private String product_detail = "";
 	private int product_stock = 0;
-	private String product_img = "";
 	private Integer product_dlvyfee = 0;
 	private Integer product_dlvylimit = 0;
 	private int category_local_no = 0;
 	private int category_type_no = 0;
 //	private Integer option_no = 0;
 	private String m_id = "";
+	private List<ProductFileVO> productfileVO;
 //	public int getProduct_no() {
 //		return product_no;
 //	}

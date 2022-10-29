@@ -1,12 +1,12 @@
 package com.meaningfarm.mall.product;
 
 import java.util.List;
-import java.util.Map;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+
 
 @Service
 public class ProductService {
@@ -15,6 +15,7 @@ public class ProductService {
 	
 	@Autowired
 	private ProductDAO productDAO;
+	
 	
 	public List<ProductVO> productList() {
 		List<ProductVO> productList = null;
@@ -29,16 +30,15 @@ public class ProductService {
 		return productDetail;
 	}
 	
-	public int productInsert(ProductVO productVO) {
+	public void productInsert(ProductVO productVO) {
 		logger.info("ProductService productInsert");
 		// if문을 vo.set~~을 0으로
 		if(productVO.getProduct_dlvyfee() == null) {
 			productVO.setProduct_dlvyfee(0);
 		}
-		int result = productDAO.productInsert(productVO);
+		productDAO.productInsert(productVO);
 		logger.info("ProductService productInsert result" + productVO);
-		logger.info("result " + result);
-		return result;
+		
 	}
 	
 	public void productUpdate(ProductVO productVO) {
@@ -51,46 +51,6 @@ public class ProductService {
 		productDAO.productDelete(product_no);
 	}
 	
-	public List<OptionVO> optionList() {
-		List<OptionVO> optionList = null;
-		optionList = productDAO.optionList();
-		logger.info("ProductService optionList " + optionList);
-		return optionList;
-	}
-	
-//	public List<Map<String, Object>> optionList(Map<String, Object> optionListMap) {
-//		logger.info("ProductService optionList");
-//		List<Map<String, Object>> optionList = null;
-//		optionList = productDAO.optionList(optionListMap);
-//		return optionList;
-//	}
-	
-	public OptionVO optionDetail(int option_no) {
-		logger.info("ProductService optionDetail");
-		OptionVO optionDetail = productDAO.optionDetail(option_no);
-		return optionDetail;
-	}
-	
-	public int optionInsert(OptionVO optionVO) {
-		logger.info("ProductService optionInsert");
-		int result = productDAO.optionInsert(optionVO);
-		return result;
-	}
-	
-	public void optionUpdate(OptionVO optionVO) {
-		logger.info("ProductService optionUpdate " + optionVO);
-		productDAO.optionUpdate(optionVO);
-	}
-	
-	public void optionDelete(int option_no) {
-		logger.info("ProductService optionDelete " + option_no);
-		productDAO.optionDelete(option_no);
-	}
-
-	public void optionCheckDelete(int option_no) {
-		logger.info("ProductService optionDelete " + option_no);
-		productDAO.optionDelete(option_no);
-	}
 	
 	
 	
@@ -104,6 +64,25 @@ public class ProductService {
 		List<CategoryLocalVO> CLList = null;
 		CLList = productDAO.CLList();
 		return CLList;
+	}
+	
+//	public List<ProductFileVO> productfileList(int product_no) {
+//		List<ProductFileVO> PFList = null;
+//		PFList = productDAO.productfileList(product_no);
+//		return PFList;
+//	}
+
+	public int productfileInsert(ProductFileVO productfileVO) {
+		logger.info("ProductService productfileInsert");
+		int result = productDAO.productfileInsert(productfileVO);
+		logger.info("ProductService productfileInsert result" + productfileVO);
+		logger.info("result " + result);
+		return result;
+	}
+
+	public void productfileDelete(int productfile_no) {
+		logger.info("ProductService productfileDelete " + productfile_no);
+		productDAO.productfileDelete(productfile_no);		
 	}
 
 }
