@@ -5,42 +5,69 @@
 <head>
 <meta charset="UTF-8">
 <title>write</title>
+<%@ include file="../../../common/common.jsp" %>
 </head>
 <body>
-<%@ include file="../../../common/common.jsp" %>
+<style>
+.scontainer {
+	float: left;
+	margin-top: -40px;
+	margin-left: 100px;
+}
+#piContainer {
+	width: 70%;
+	margin: 0 auto;
+	float: right;
+	margin-right: 120px;
+	margin-bottom: 50px;
+}
+#ffooter {
+	clear: both;
+}
+a {
+	text-decoration: none;
+	color: black;
+}
+table {
+	text-align: center;
+}
+</style>
+<%@ include file="../../../layout/header.jsp" %>
+<%@ include file="../../../layout/nav.jsp" %>
+<%@ include file="../../../layout/sidebar.jsp" %>
+<div id="piContainer">
 <h1>상품 등록</h1>
+<input type="text" value="${m_id}">
 <form action="./productinsert" method="post" id="f_product" enctype="multipart/form-data"> <br/>
-상품명 : <input type="text" name="product_name" id="product_name"> <br/>
-카테고리(지역) :
-	<select id="s_category_local_no" name="category_local_no">
-		<option selected value="">선택</option>
-	</select><br/>
-카테고리(종류) :
-	<select id="s_category_type_no" name="category_type_no">
-		<option selected value="">선택</option>
-	</select><br/>
-
-판매가격 : <input type="text" name="product_price"> <br/>
-재고 : <input type="text" name="product_stock"> <br/>
-이미지 첨부 : <input type="file" name="product_img" id="product_img" accept="image/*" multiple> <br/>
+<input type="text" class="form-control" name="product_name" id="product_name" placeholder="상품명"> <br/>
+<select class="form-select" id="s_category_local_no" name="category_local_no">
+	<option selected value="">카테고리-지역</option>
+</select><br/>
+<select class="form-select" id="s_category_type_no" name="category_type_no">
+	<option selected value="">카테고리-종류</option>
+</select><br/>
+<input type="text" class="form-control" name="product_price" placeholder="상품 가격"> <br/>
+<input type="text" class="form-control" name="product_stock" placeholder="상품 재고"> <br/>
+<input type="file" class="form-control" name="product_img" id="product_img" accept="image/*" multiple> <br/>
 <div id="uploadResult">
 </div>
-배송비 :
-<input type="radio" name="dlvyfee_radio" value="dlvyfee_x"> 무료
-<input type="radio" name="dlvyfee_radio" value="dlvyfee_s"> 조건부 무료
-<input type="radio" name="dlvyfee_radio" value="dlvyfee_o"> 유료 <br/>
+<input type="radio" class="form-check-input" name="dlvyfee_radio" value="dlvyfee_x"> 무료
+<input type="radio" class="form-check-input" name="dlvyfee_radio" value="dlvyfee_s"> 조건부 무료
+<input type="radio" class="form-check-input" name="dlvyfee_radio" value="dlvyfee_o"> 유료 <br/>
 <div id="tb_dlvyfee_s" style="display:none;">
-	배송비 조건 <input type="text" name="product_dlvylimit"> 원 이상 무료 <br/>
-	기본 배송비 <input type="text" id="" name="product_dlvyfee"> 원
+	배송비 조건 <input type="text" class="form-control" name="product_dlvylimit"> 원 이상 무료 <br/>
+	기본 배송비 <input type="text" class="form-control" id="" name="product_dlvyfee"> 원
 </div>
 <div id="tb_dlvyfee_o" style="display:none;">
-	기본 배송비 <input type="text" id="" name="product_dlvyfee"> 원
+	기본 배송비 <input type="text" class="form-control" id="" name="product_dlvyfee"> 원
 </div>
-상세 설명 : <input type="textarea" name="product_detail"> <br/>
-m_id : <input type="textarea" name="m_id"> <br/>
+<input type="textarea" class="form-control" name="product_detail" placeholder="상세 설명"> <br/>
+<input type="hidden" name="m_id" value="${m_id}">
 </form>
-<button id="b_submit">등록</button>
-
+<button id="b_submit" class="btn btn-warning">등록</button>
+<button type="button" class="btn btn-dark" onclick="location.href='./productlisttest'">취소</button>
+</div>
+<%@ include file="../../../layout/footer.jsp" %>
 <script type="text/javascript">
 $(document).ready(function() {
 	// 배송비 라디오버튼 클릭하면 텍스트박스 뜨는 코드 시작
@@ -134,16 +161,11 @@ $(document).ready(function() {
 		console.log(imgObj);
 	}) // end of input type file change
 	
-	let regex = new RegExp("(.*?)\.(jpg|png|gif|JPG|PNG|GIF)$"); // 파일 형식 제한
 	let maxSize = 10485760000; // 파일 용량 제한
 	
 	function imgCheck(imgName, imgSize) {
 		if(imgSize >= maxSize) {
 			alert("파일 사이즈 초과");
-			return false;
-		}
-		if(!regex.test(imgName)) {
-			alert("업로드할 수 없는 파일 형식");
 			return false;
 		}
 		return true;
@@ -152,16 +174,16 @@ $(document).ready(function() {
 	// 이미지 출력
 	function showUploadImage(uploadResultArr) {
 		if(!uploadResultArr || uploadResultArr.length == 0) { alert("showUploadImage 오류"); return }
+		let uploadResult = $("#uploadResult");
+		let imsi = "";
+		uploadResult.html(imsi);
 		for(let i=0;i<uploadResultArr.length;i++) {
-			let uploadResult = $("#uploadResult");
 			let obj = uploadResultArr[i];
 			let str = "";
-		//	let imsi = obj.productfile_path.replace(/\\/g, '/').indexOf('resource');
-		//	let imsi2 = obj.productfile_path.replace(/\\/g, '/').slice(imsi);
-		//	let fileCallPath = imsi2 + "/s_" + obj.productfile_name;
-			let imsi = obj.productfile_path.replace(/\\/g, '/').indexOf('20');
-			let imsi2 = obj.productfile_path.replace(/\\/g, '/').slice(imsi);
-			let fileCallPath = imsi2 + "/s_" + obj.productfile_name;
+//			let imsi = obj.productfile_path.replace(/\\/g, '/').indexOf('20');
+//			let imsi2 = obj.productfile_path.replace(/\\/g, '/').slice(imsi);
+//			let fileCallPath = "s_" + obj.productfile_name;
+			let fileCallPath = obj.productfile_sname;
 		//	let fileCallPath = obj.productfile_path.replace(/\\/g, '/') + "/s_" + obj.productfile_name;
 			console.log(fileCallPath)
 			
@@ -169,10 +191,10 @@ $(document).ready(function() {
 			str += "<img src='productfiledetail?imgName=" + fileCallPath + "'>";
 		//	str += "<img src='/mall/" + fileCallPath + "'>";
 			str += "<div class='imgDeleteBtn' data-file='" + fileCallPath + "'>x</div>";
-			str += "</div>"
 			str += "<input type='hidden' name='productfileVO[" + i + "].productfile_name' value='"+ obj.productfile_name +"'>";
 			str += "<input type='hidden' name='productfileVO[" + i + "].productfile_sname' value='"+ obj.productfile_sname +"'>";
 			str += "<input type='hidden' name='productfileVO[" + i + "].productfile_path' value='"+ obj.productfile_path +"'>";
+			str += "</div>"
 			
 			uploadResult.append(str);
 		} // end for for

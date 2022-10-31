@@ -4,7 +4,9 @@
 
 <mapper namespace="com.mybatis.mapper.ProductMapper">
 <select id="productSelectAll" resultType="com.meaningfarm.mall.product.ProductVO">
-	select * from product
+	select * from product, category_type, category_local
+	where product.category_type_no = category_type.category_type_no
+	and product.category_local_no = category_local.category_local_no
 	order by product_no asc
 </select>
 <select id="productSelectOne" parameterType="int" resultType="com.meaningfarm.mall.product.ProductVO">
@@ -40,7 +42,9 @@
 	where product_no = #{product_no}
 </delete>
 
-<select id="productfileSelect" resultType="com.meaningfarm.mall.product.ProductFileVO">
+
+<!-- productfile -->
+<select id="productfileList" parameterType="int" resultType="com.meaningfarm.mall.product.ProductFileVO">
 	select * from productfile2
 	where product_no = #{product_no}
 </select>
@@ -49,6 +53,10 @@
 	values(seq_productfile_no.nextval, #{productfile_name}, #{productfile_sname}, #{productfile_path}, #{product_no})
 </insert>
 <delete id="productfileDelete" parameterType="int">
+	delete from productfile2
+	where product_no = #{product_no}
+</delete>
+<delete id="productfileDeleteOne" parameterType="int">
 	delete from productfile2
 	where productfile_no = #{productfile_no}
 </delete>

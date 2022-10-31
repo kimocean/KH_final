@@ -18,6 +18,8 @@ public class ProductVO {
 	private int category_type_no = 0;
 //	private Integer option_no = 0;
 	private String m_id = "";
+	private String category_local_name = "";
+	private String category_type_name = "";
 	private List<ProductFileVO> productfileVO = null;
 //	public int getProduct_no() {
 //		return product_no;

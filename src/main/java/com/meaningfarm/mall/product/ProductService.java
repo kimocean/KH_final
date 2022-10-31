@@ -50,14 +50,33 @@ public class ProductService {
 		return result;
 	}
 	
-	public void productUpdate(ProductVO productVO) {
+	@Transactional
+	public int productUpdate(ProductVO productVO) {
 		logger.info("ProductService productUpdate " + productVO);
-		productDAO.productUpdate(productVO);
+		int result = productDAO.productUpdate(productVO);
+		
+		System.out.println(result);
+		System.out.println(productVO.getProductfileVO());
+//		System.out.println(productVO.getProductfileVO().size());
+		
+		if(result == 1 && productVO.getProductfileVO() != null && productVO.getProductfileVO().size() > 0) {
+			productDAO.productfileDelete(productVO.getProduct_no());
+			productVO.getProductfileVO().forEach(productfileVO -> {
+				productfileVO.setProduct_no(productVO.getProduct_no());
+				productDAO.productfileInsert(productfileVO);
+			});
+		}
+		return result;
 	}
 	
 	public void productDelete(int product_no) {
 		logger.info("ProductService productDelete " + product_no);
 		productDAO.productDelete(product_no);
+	}
+	
+	public void productCheckDelete(int option_no) {
+		logger.info("ProductService productCheckDelete " + option_no);
+		productDAO.productDelete(option_no);
 	}
 	
 	
@@ -75,11 +94,11 @@ public class ProductService {
 		return CLList;
 	}
 	
-//	public List<ProductFileVO> productfileList(int product_no) {
-//		List<ProductFileVO> PFList = null;
-//		PFList = productDAO.productfileList(product_no);
-//		return PFList;
-//	}
+		public List<ProductFileVO> productfileList(int product_no) {
+		List<ProductFileVO> PFList = null;
+		PFList = productDAO.productfileList(product_no);
+		return PFList;
+	}
 
 //	public int productfileInsert(ProductFileVO productfileVO) {
 //		logger.info("ProductService productfileInsert");
@@ -93,5 +112,6 @@ public class ProductService {
 		logger.info("ProductService productfileDelete " + productfile_no);
 		productDAO.productfileDelete(productfile_no);		
 	}
+
 
 }

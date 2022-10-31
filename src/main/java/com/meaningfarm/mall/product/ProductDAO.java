@@ -35,9 +35,9 @@ public class ProductDAO {
 		return result;
 	}
 	
-	public void productUpdate(ProductVO productVO) {
+	public int productUpdate(ProductVO productVO) {
 		logger.info("ProductDAO productUpdate " + productVO);
-		sst.update("productUpdate", productVO);
+		return sst.update("productUpdate", productVO);
 	}
 	
 	public void productDelete(int product_no) {
@@ -61,10 +61,10 @@ public class ProductDAO {
 		
 	}
 	
-	public List<ProductFileVO> productfileList(ProductFileVO productfileVO) {
-		List<ProductFileVO> PFList = null;
-		PFList = sst.selectList("productfileSelect");
-		return PFList;
+	public List<ProductFileVO> productfileList(int product_no) {
+		logger.info("ProductDAO productfileList product_no " + product_no);
+		return sst.selectList("productfileList", product_no);
+//		return sst.selectOne("productfileList", product_no);
 	}
 	
 	public int productfileInsert(ProductFileVO productfileVO) {
@@ -75,8 +75,9 @@ public class ProductDAO {
 		return result;
 	}
 
-	public void productfileDelete(int productfile_no) {
-		logger.info("ProductService productfileDelete " + productfile_no);
-		sst.delete("productfileDelete", productfile_no);
+	public void productfileDelete(int product_no) {
+		logger.info("ProductService productfileDelete " + product_no);
+		sst.delete("productfileDelete", product_no);
 	}
+	
 }
