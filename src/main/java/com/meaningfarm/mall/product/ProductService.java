@@ -112,6 +112,27 @@ public class ProductService {
 		logger.info("ProductService productfileDelete " + productfile_no);
 		productDAO.productfileDelete(productfile_no);		
 	}
-
+	
+	
+	
+	
+	public List<ProductVO> getListPaging(PageVO pageVO) {
+		logger.info("ProductService getListPaging " + pageVO);
+		List<ProductVO> getListPaging = productDAO.getListPaging(pageVO);
+		logger.info("ProductService getListPaging 끝 " + pageVO);
+		return getListPaging;
+	}
+	
+	
+	
+	public int countProduct(String m_id) {
+		logger.info("productDAO.countBoard " + productDAO.countBoard(m_id));
+		return productDAO.countBoard(m_id);
+	}
+	
+	public List<ProductVO> selectProductPage(PageVO pageVO) {
+		logger.info("PageVO " + pageVO);
+		return productDAO.selectProductPage(pageVO);
+	}
 
 }

@@ -60,4 +60,46 @@
 	delete from productfile2
 	where productfile_no = #{productfile_no}
 </delete>
+
+
+<select id="getListPaging" resultType="com.meaningfarm.mall.product.ProductVO">
+	<![CDATA[
+		select rn, product_no, category_type_name, category_local_name, product_name, product_price, product_dlvyfee
+		  from (
+		  		select /*+INDEX_DESC(product PK_PRODUCT) */ rownum as rn, product_no, category_type_no,
+		  			   category_local_no, product_name, product_price, product_dlvyfee, m_id
+    			  from product where rownum <= #{pageNum} * #{amount}) product, category_type, category_local
+         where rn > (#{pageNum} -1) * #{amount}
+		   and product.category_type_no = category_type.category_type_no
+		   and product.category_local_no = category_local.category_local_no
+		]]>
+</select>
+
+
+<select id="countProduct" resultType="int">
+	select count(*) from product
+	where m_id = #{m_id}
+	<trim>
+		<if test="product_name=='product_name' and keyword != null and keyword != '' ">
+			product_name like CONCAT('%', #{keyword}, '%')
+		</if>
+	</trim>
+</select>
+<select id="selectProductPage" resultType="com.meaningfarm.mall.product.ProductVO">
+	select *
+	from (
+			select rownum rn, A.*
+			from (
+					select * from product
+					where m_id = #{m_id}
+					order by product_no desc
+			) A
+		<trim prefix="WHERE" prefixOverrides="AND|OR">
+			<if test="product_name=='product_name' and keyword != null and keyword != '' ">
+				AND product_name like CONCAT('%', #{keyword}, '%')
+			</if>
+		</trim>
+		)
+	where rn between #{start} and #{end}
+</select>
 </mapper>

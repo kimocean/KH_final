@@ -39,6 +39,20 @@ table {
 <%@ include file="../../../layout/sidebar.jsp" %>
 <div id="productListContainer">
 <h1>게시판 목록</h1>
+
+	<div style="float: right;">
+		<select id="cntPerPage" name="sel" onchange="selChange()">
+			<option value="5"
+				<c:if test="${paging.cntPerPage == 5}">selected</c:if>>5줄 보기</option>
+			<option value="10"
+				<c:if test="${paging.cntPerPage == 10}">selected</c:if>>10줄 보기</option>
+			<option value="15"
+				<c:if test="${paging.cntPerPage == 15}">selected</c:if>>15줄 보기</option>
+			<option value="20"
+				<c:if test="${paging.cntPerPage == 20}">selected</c:if>>20줄 보기</option>
+		</select>
+	</div> <!-- 옵션선택 끝 -->
+
 <table id="t_productList" class="table table-hover">
 	<th><input class="form-check-input" type="checkbox" name="cb_product_all"></th>
 	<th>상품명</th>
@@ -47,7 +61,7 @@ table {
 	<th>상품가격</th>
 	<th>배송비</th>
 	<c:set var="doneLoop" value="false"/>
-	<c:forEach items="${productSelectAll}" var="list" varStatus="status">
+	<c:forEach items="${viewAll}" var="list" varStatus="status">
 		<c:choose>
 			<c:when test="${m_id eq null and not doneLoop}">
 				<h1>판매자 권한 필요</h1>
@@ -70,8 +84,46 @@ table {
 		<button type="button" class="btn btn-warning" onclick="location.href='./productinsert'">등록</button>
 		<button type="button" class="btn btn-dark" onclick="remove()">삭제</button>
 	</div>
+	<!-- start of page -->
+	<div style="text-align: center;">		
+		<c:if test="${paging.startPage!=1}">
+			<a href="/mall/product/productlisttest?nowPage=${paging.startPage-1}&cntPerPage=${paging.cntPerPage}">&lt;</a>
+		</c:if>
+		<c:forEach begin="${paging.startPage}" end="${paging.endPage}" var="p">
+			<c:choose>
+				<c:when test="${p==paging.nowPage}">
+					<b>${p}</b>
+				</c:when>
+				<c:when test="${p!=paging.nowPage}">
+					<a href="/mall/product/productlisttest?nowPage=${p}&cntPerPage=${paging.cntPerPage}">${p}</a>
+				</c:when>
+			</c:choose>
+		</c:forEach>
+		<c:if test="${paging.endPage != paging.lastPage}">
+			<a href="/mall/product/productlisttest?nowPage=${paging.endPage+1}&cntPerPage=${paging.cntPerPage}">&gt;</a>
+		</c:if>
+	</div>
+	<!-- end of page -->
+	<!-- start of search -->
+	<div class="form-group row justify-content-center">
+			<div class="w100" style="padding-right:10px">
+				<select class="form-control form-control-sm" name="searchType" id="searchType">
+					<option value="title">제목</option>
+					<option value="Content">본문</option>
+					<option value="reg_id">작성자</option>
+				</select>
+			</div>
+			<div class="w300" style="padding-right:10px">
+				<input type="text" class="form-control form-control-sm" name="keyword" id="keyword">
+			</div>
+			<div>
+				<button class="btn btn-sm btn-primary" name="btnSearch" id="btnSearch">검색</button>
+			</div>
+		</div>
+	<!-- start of search -->
 </div>
 </div>
+<c:url var="getBoardListURL" value="/mall/product/productlisttest"></c:url>
 <%@ include file="../../../layout/footer.jsp" %>
 <script type="text/javascript">
 // 체크박스 선택       
@@ -129,6 +181,21 @@ function remove() {
 		console.log(JSON.stringify(error));
 	})
 }
+
+function selChange() {
+	let sel = document.getElementById('cntPerPage').value;
+	location.href="productlisttest?nowPage=${paging.nowPage}&cntPerPage="+sel;
+}
+
+$(document).on('click', '#btnSearch', function(e){
+	e.preventDefault();
+	let url = "${pageContext.request.contextPath}/mall/product/productlisttest";
+	url = url + "?searchType=" + $('#searchType').val();
+	url = url + "&keyword=" + $('#keyword').val();
+	location.href = url;
+	console.log(url);
+
+});
 </script>
 </body>
 </html>

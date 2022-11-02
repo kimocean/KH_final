@@ -80,4 +80,27 @@ public class ProductDAO {
 		sst.delete("productfileDelete", product_no);
 	}
 	
+	
+	// 게시판 목록(페이징 적용)
+	public List<ProductVO> getListPaging(PageVO pageVO) {
+		logger.info("PageVO " + pageVO);
+		List<ProductVO> getListPaging = null;
+		getListPaging = sst.selectList("getListPaging", pageVO);
+		logger.info("ProductDAO getListPaging " + getListPaging);
+		return getListPaging;
+	}
+	
+	
+	public int countBoard(String m_id) {
+		return sst.selectOne("countProduct", m_id);
+	}
+	
+	public List<ProductVO> selectProductPage(PageVO pageVO) {
+		logger.info("PageVO " + pageVO);
+		List<ProductVO> selectProductPage = null;
+		selectProductPage = sst.selectList("selectProductPage", pageVO);
+		logger.info("ProductDAO selectProductPage " + selectProductPage);
+		return selectProductPage;
+	}
+	
 }

@@ -47,16 +47,31 @@ public class ProductController {
 //		logger.info("게시판 목록");
 //	}
 	// product 상품 목록 페이지 띄우기
-	@GetMapping("/productlisttest")
-	public String productList(Model model, HttpServletRequest request) {
-		HttpSession session = request.getSession();
-		String m_id = "1";
-		session.setAttribute("m_id", m_id);
-		logger.info("ProductController productList");
-		model.addAttribute("productSelectAll", productService.productList());
-		logger.info(productService.productList().toString());
-		return "product/productlisttest";
-	}
+//	@GetMapping("/productlisttest")
+//	public String productList(Model model, HttpServletRequest request, PageVO pageVO) {
+//		HttpSession session = request.getSession();
+//		String m_id = "1";
+//		session.setAttribute("m_id", m_id);
+//		logger.info("ProductController productList " + pageVO);
+////		model.addAttribute("productSelectAll", productService.productList());
+////		logger.info(productService.productList().toString());
+//		model.addAttribute("productSelectAll", productService.getListPaging(pageVO));
+//		logger.info("ProductController productList 페이지VO " + pageVO);
+//		logger.info("ProductController productList 프로덕트리스트 " + productService.getListPaging(pageVO));
+//		return "product/productlisttest";
+//	}
+//	// product 상품 목록 페이지 띄우기
+//	@GetMapping("/productlisttest")
+//	public String productList(Model model, HttpServletRequest request) {
+//		HttpSession session = request.getSession();
+//		String m_id = "1";
+//		session.setAttribute("m_id", m_id);
+//		logger.info("ProductController productList");
+//		model.addAttribute("productSelectAll", productService.productList());
+//		logger.info(productService.productList().toString());
+//		return "product/productlisttest";
+//		
+//	}
 	// product 상품 페이지 이동
 //	@GetMapping("/productinsert")
 //	public void productInsert(HttpServletRequest request) {
@@ -278,4 +293,33 @@ public class ProductController {
 //		productService.productfileInsert(productfileVO);
 //		return "";
 //	}
+	
+	
+	@GetMapping("/productlisttest")
+	public String selectProductPage(Model model, HttpServletRequest request, PageVO pageVO,
+									@RequestParam(value="nowPage", required=false)String nowPage,
+									@RequestParam(value="cntPerPage", required=false)String cntPerPage,
+									@RequestParam(defaultValue="product_no", required=false)String searchType,
+									@RequestParam(value="keyword", required=false)String keyword) {
+		HttpSession session = request.getSession();
+		String m_id = "1";
+		session.setAttribute("m_id", m_id);
+		int total = productService.countProduct(m_id);
+		if(nowPage == null && cntPerPage == null) {
+			nowPage = "1";
+			cntPerPage = "5";
+		} else if(nowPage == null) {
+			nowPage = "1";
+		} else if(cntPerPage == null) {
+			cntPerPage = "5";
+		}
+		pageVO = new PageVO(total, Integer.parseInt(nowPage), Integer.parseInt(cntPerPage), (String)session.getAttribute("m_id"));
+		model.addAttribute("paging", pageVO);
+		model.addAttribute("viewAll", productService.selectProductPage(pageVO));
+		
+		SearchVO searchVO = new SearchVO();
+		searchVO.setSearchType(searchType);
+		searchVO.setKeyword(keyword);
+		return "product/productlisttest";
+	}
 }
