@@ -62,44 +62,40 @@
 </delete>
 
 
-<select id="getListPaging" resultType="com.meaningfarm.mall.product.ProductVO">
-	<![CDATA[
-		select rn, product_no, category_type_name, category_local_name, product_name, product_price, product_dlvyfee
-		  from (
-		  		select /*+INDEX_DESC(product PK_PRODUCT) */ rownum as rn, product_no, category_type_no,
-		  			   category_local_no, product_name, product_price, product_dlvyfee, m_id
-    			  from product where rownum <= #{pageNum} * #{amount}) product, category_type, category_local
-         where rn > (#{pageNum} -1) * #{amount}
-		   and product.category_type_no = category_type.category_type_no
-		   and product.category_local_no = category_local.category_local_no
-		]]>
-</select>
 
-
-<select id="countProduct" resultType="int">
+<select id="listCount" resultType="int">
 	select count(*) from product
 	where m_id = #{m_id}
-	<trim>
-		<if test="product_name=='product_name' and keyword != null and keyword != '' ">
-			product_name like CONCAT('%', #{keyword}, '%')
-		</if>
-	</trim>
+	<include refid="search"></include>
+	and product_no > 0
 </select>
-<select id="selectProductPage" resultType="com.meaningfarm.mall.product.ProductVO">
+<select id="listPage" resultType="com.meaningfarm.mall.product.ProductVO">
 	select *
 	from (
-			select rownum rn, A.*
-			from (
-					select * from product
-					where m_id = #{m_id}
-					order by product_no desc
-			) A
-		<trim prefix="WHERE" prefixOverrides="AND|OR">
-			<if test="product_name=='product_name' and keyword != null and keyword != '' ">
-				AND product_name like CONCAT('%', #{keyword}, '%')
-			</if>
-		</trim>
-		)
-	where rn between #{start} and #{end}
+		select rownum rn, product_no, product_name, product_price, product_detail, product_stock, product_dlvyfee, m_id,
+    		   category_type_name, category_local_name
+		from (
+			select product_no, product_name, product_price, product_detail, product_stock, product_dlvyfee, m_id,
+				   P.category_type_no, P.category_local_no,
+				   CT.category_type_no, CT.category_type_name,
+				   CL.category_local_no, CL.category_local_name
+        	from product P, category_type CT, category_local CL
+        	where m_id = #{m_id}
+	        and P.category_type_no = CT.category_type_no
+	        and P.category_local_no = CL.category_local_no
+	        and 1=1
+	        <include refid="search"></include>
+	        order by product_no desc
+		) A
+	)
+	where rn between #{rowStart} and #{rowEnd}
 </select>
+
+<sql id="search">
+	<if test="searchType != null">
+		<if test="searchType == 't'.toString()">AND product_name LIKE '%' || #{keyword} || '%'</if>
+		<if test="searchType == 'w'.toString()">AND product_detail LIKE '%' || #{keyword} || '%'</if>
+		<if test="searchType == 'tc'.toString()">AND (product_name LIKE '%' || #{keyword} || '%') or (product_detail LIKE '%' || #{keyword} || '%')</if>
+	</if>
+</sql>
 </mapper>

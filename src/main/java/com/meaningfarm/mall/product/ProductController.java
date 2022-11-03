@@ -25,6 +25,7 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.util.FileCopyUtils;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -47,19 +48,25 @@ public class ProductController {
 //		logger.info("게시판 목록");
 //	}
 	// product 상품 목록 페이지 띄우기
-//	@GetMapping("/productlisttest")
-//	public String productList(Model model, HttpServletRequest request, PageVO pageVO) {
-//		HttpSession session = request.getSession();
-//		String m_id = "1";
-//		session.setAttribute("m_id", m_id);
-//		logger.info("ProductController productList " + pageVO);
-////		model.addAttribute("productSelectAll", productService.productList());
-////		logger.info(productService.productList().toString());
-//		model.addAttribute("productSelectAll", productService.getListPaging(pageVO));
-//		logger.info("ProductController productList 페이지VO " + pageVO);
-//		logger.info("ProductController productList 프로덕트리스트 " + productService.getListPaging(pageVO));
-//		return "product/productlisttest";
-//	}
+	@GetMapping("/productlisttest")
+	public String productList(Model model, HttpServletRequest request, @ModelAttribute("searchVO")SearchVO searchVO) {
+		HttpSession session = request.getSession();
+		String m_id = "1";
+		session.setAttribute("m_id", m_id);
+		
+		searchVO.setM_id(m_id);
+		logger.info("ProductController productList " + searchVO);
+		
+		model.addAttribute("productSelectAll", productService.list(searchVO));
+		
+		PageVO pageVO = new PageVO();
+		pageVO.setCri(searchVO);
+		pageVO.setTotalCount(productService.listCount(searchVO));
+		
+		model.addAttribute("pageVO", pageVO);
+		
+		return "product/productlisttest";
+	}
 //	// product 상품 목록 페이지 띄우기
 //	@GetMapping("/productlisttest")
 //	public String productList(Model model, HttpServletRequest request) {
@@ -295,31 +302,35 @@ public class ProductController {
 //	}
 	
 	
-	@GetMapping("/productlisttest")
-	public String selectProductPage(Model model, HttpServletRequest request, PageVO pageVO,
-									@RequestParam(value="nowPage", required=false)String nowPage,
-									@RequestParam(value="cntPerPage", required=false)String cntPerPage,
-									@RequestParam(defaultValue="product_no", required=false)String searchType,
-									@RequestParam(value="keyword", required=false)String keyword) {
-		HttpSession session = request.getSession();
-		String m_id = "1";
-		session.setAttribute("m_id", m_id);
-		int total = productService.countProduct(m_id);
-		if(nowPage == null && cntPerPage == null) {
-			nowPage = "1";
-			cntPerPage = "5";
-		} else if(nowPage == null) {
-			nowPage = "1";
-		} else if(cntPerPage == null) {
-			cntPerPage = "5";
-		}
-		pageVO = new PageVO(total, Integer.parseInt(nowPage), Integer.parseInt(cntPerPage), (String)session.getAttribute("m_id"));
-		model.addAttribute("paging", pageVO);
-		model.addAttribute("viewAll", productService.selectProductPage(pageVO));
-		
-		SearchVO searchVO = new SearchVO();
-		searchVO.setSearchType(searchType);
-		searchVO.setKeyword(keyword);
-		return "product/productlisttest";
-	}
+//	@GetMapping("/productlisttest")
+//	public String selectProductPage(Model model, HttpServletRequest request, PageVO pageVO,
+//									@RequestParam(value="nowPage", required=false)String nowPage,
+//									@RequestParam(value="cntPerPage", required=false)String cntPerPage,
+//									@RequestParam(defaultValue="product_no", required=false)String searchType,
+//									@RequestParam(value="keyword", required=false)String keyword) {
+//		HttpSession session = request.getSession();
+//		String m_id = "1";
+//		session.setAttribute("m_id", m_id);
+//		
+//		SearchVO searchVO = new SearchVO();
+//		searchVO.setSearchType(searchType);
+//		searchVO.setKeyword(keyword);
+//		
+//		int total = productService.countProduct(searchVO);
+////		int total = productService.countProduct(m_id);
+//		if(nowPage == null && cntPerPage == null) {
+//			nowPage = "1";
+//			cntPerPage = "5";
+//		} else if(nowPage == null) {
+//			nowPage = "1";
+//		} else if(cntPerPage == null) {
+//			cntPerPage = "5";
+//		}
+//		pageVO = new PageVO(total, Integer.parseInt(nowPage), Integer.parseInt(cntPerPage), (String)session.getAttribute("m_id"));
+//		model.addAttribute("paging", pageVO);
+//		model.addAttribute("viewAll", productService.selectProductPage(searchVO));
+////		model.addAttribute("viewAll", productService.selectProductPage(pageVO));
+//		
+//		return "product/productlisttest";
+//	}
 }

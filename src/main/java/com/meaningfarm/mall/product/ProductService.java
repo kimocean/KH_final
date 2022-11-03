@@ -115,24 +115,12 @@ public class ProductService {
 	
 	
 	
-	
-	public List<ProductVO> getListPaging(PageVO pageVO) {
-		logger.info("ProductService getListPaging " + pageVO);
-		List<ProductVO> getListPaging = productDAO.getListPaging(pageVO);
-		logger.info("ProductService getListPaging 끝 " + pageVO);
-		return getListPaging;
+	public List<ProductVO> list(SearchVO searchVO) {
+		logger.info("ProductService list " + searchVO);
+		return productDAO.list(searchVO);
 	}
 	
-	
-	
-	public int countProduct(String m_id) {
-		logger.info("productDAO.countBoard " + productDAO.countBoard(m_id));
-		return productDAO.countBoard(m_id);
+	public int listCount(SearchVO searchVO) {
+		return productDAO.listCount(searchVO);
 	}
-	
-	public List<ProductVO> selectProductPage(PageVO pageVO) {
-		logger.info("PageVO " + pageVO);
-		return productDAO.selectProductPage(pageVO);
-	}
-
 }

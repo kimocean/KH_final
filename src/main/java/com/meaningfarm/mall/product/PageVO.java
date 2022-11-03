@@ -1,66 +1,94 @@
 package com.meaningfarm.mall.product;
 
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpSession;
+import java.io.UnsupportedEncodingException;
+import java.net.URLEncoder;
 
-import lombok.Data;
+import org.springframework.web.util.UriComponents;
+import org.springframework.web.util.UriComponentsBuilder;
 
-@Data
 public class PageVO {
-//	// 현재 페이지
-//	private int pageNum = 0;
-//	// 한 페이지당 보여질 게시물 수
-//	private int amount = 0;
-//	// 기본 생성자 -> 기본 세팅 : pageNum = 1, amount = 10인데 나는 2로 함
-//	public PageVO() {
-//		this(1, 2);
-//	}
-//	public PageVO(int pageNum, int amount) {
-//		this.pageNum = pageNum;
-//		this.amount = amount;
-//	}
-	
-	// 현재 페이지, 시작 페이지, 끝페이지, 게시글 총 갯수, 페이지당 글 갯수, 마지막 페이지, sql 쿼리에 쓸 start, end
-	private int nowPage, startPage, endPage, total, cntPerPage, lastPage, start, end;
-	private int cntPage = 5;
-	private String m_id = "";
-	
-	public PageVO() {}
-	
-	public PageVO(int total, int nowPage, int cntPerPage, String m_id) {
-		setNowPage(nowPage);
-		setCntPerPage(cntPerPage);
-		setTotal(total, m_id);
-		setM_id(m_id);
-		calcLastPage(getTotal(), getCntPerPage());
-		calcStartEndPage(getNowPage(), cntPage);
-		calcStartEnd(getNowPage(), getCntPerPage());
+
+	private int totalCount;
+	private int startPage;
+	private int endPage;
+	private boolean prev;
+	private boolean next;
+	private int displayPageNum = 2;
+	private Criteria cri;
+
+	public void setCri(Criteria cri) {
+		this.cri = cri;
 	}
-	
-	// 제일 마지막 페이지 계산
-	public void calcLastPage(int total, int cntPerPage) {
-		setLastPage((int)Math.ceil((double)total / (double)cntPerPage));
+
+	public void setTotalCount(int totalCount) {
+		this.totalCount = totalCount;
+		calcData();
 	}
-	// 시작, 끝 페이지 계산
-	public void calcStartEndPage(int nowPage, int cntPage) {
-		setEndPage(((int)Math.ceil((double)nowPage / (double) cntPage)) * cntPage);
-		if(getLastPage() < getEndPage()) {
-			setEndPage(getLastPage());
+
+	public int getTotalCount() {
+		return totalCount;
+	}
+
+	public int getStartPage() {
+		return startPage;
+	}
+
+	public int getEndPage() {
+		return endPage;
+	}
+
+	public boolean isPrev() {
+		return prev;
+	}
+
+	public boolean isNext() {
+		return next;
+	}
+
+	public int getDisplayPageNum() {
+		return displayPageNum;
+	}
+
+	public Criteria getCri() {
+		return cri;
+	}
+
+	private void calcData() {
+		endPage = (int) (Math.ceil(cri.getPage() / (double) displayPageNum) * displayPageNum);
+		startPage = (endPage - displayPageNum) + 1;
+
+		int tempEndPage = (int) (Math.ceil(totalCount / (double) cri.getPerPageNum()));
+		if (endPage > tempEndPage) {
+			endPage = tempEndPage;
 		}
-		setStartPage(getEndPage() - cntPage + 1);
-		if(getStartPage() < 1) {
-			setStartPage(1);
+		prev = startPage == 1 ? false : true;
+		next = endPage * cri.getPerPageNum() >= totalCount ? false : true;
+	}
+
+	public String makeQuery(int page) {
+		UriComponents uriComponents = UriComponentsBuilder.newInstance().queryParam("page", page)
+				.queryParam("perPageNum", cri.getPerPageNum()).build();
+		return uriComponents.toUriString();
+	}
+
+	public String makeSearch(int page) {
+		UriComponents uriComponents = UriComponentsBuilder.newInstance().queryParam("page", page)
+				.queryParam("perPageNum", cri.getPerPageNum())
+				.queryParam("searchType", ((SearchVO) cri).getSearchType())
+				.queryParam("keyword", encoding(((SearchVO) cri).getKeyword())).build();
+		return uriComponents.toUriString();
+	}
+
+	private String encoding(String keyword) {
+		if (keyword == null || keyword.trim().length() == 0) {
+			return "";
+		}
+
+		try {
+			return URLEncoder.encode(keyword, "UTF-8");
+		} catch (UnsupportedEncodingException e) {
+			return "";
 		}
 	}
-	// DB 쿼리에서 사용할 start, end 값 계산
-	public void calcStartEnd(int nowPage, int cntPerPage) {
-		setEnd(nowPage * cntPerPage);
-		setStart(getEnd() - cntPerPage + 1);
-	}
-	
-	public void setTotal(int total, String m_id) {
-		setM_id(m_id);
-		this.total = total;
-	}
-	
+
 }
