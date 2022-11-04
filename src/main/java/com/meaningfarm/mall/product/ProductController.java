@@ -67,18 +67,6 @@ public class ProductController {
 		
 		return "product/productlisttest";
 	}
-//	// product 상품 목록 페이지 띄우기
-//	@GetMapping("/productlisttest")
-//	public String productList(Model model, HttpServletRequest request) {
-//		HttpSession session = request.getSession();
-//		String m_id = "1";
-//		session.setAttribute("m_id", m_id);
-//		logger.info("ProductController productList");
-//		model.addAttribute("productSelectAll", productService.productList());
-//		logger.info(productService.productList().toString());
-//		return "product/productlisttest";
-//		
-//	}
 	// product 상품 페이지 이동
 //	@GetMapping("/productinsert")
 //	public void productInsert(HttpServletRequest request) {
@@ -159,6 +147,22 @@ public class ProductController {
 		logger.info("ProductController productfileList " + product_no);
 //		model.addAttribute("productfileList", productService.productDetail(productVO.getProduct_no()));
 		return new ResponseEntity<List<ProductFileVO>>(productService.productfileList(product_no), HttpStatus.OK);
+	}
+
+	@GetMapping("/productfiledetail") // 파일 하나만... 아마도
+	public ResponseEntity<byte[]> productfileDetail(@RequestParam(name="imgName") String imgName) {
+		logger.info("ProductController imagedetail " + imgName);
+		File file = new File("C:\\meaningFarm\\meaningFarm\\src\\main\\webapp\\resources\\image\\" + imgName);
+		ResponseEntity<byte[]> result = null;
+		try {
+			HttpHeaders header = new HttpHeaders();
+			header.add("Content-type", Files.probeContentType(file.toPath()));
+			result = new ResponseEntity<>(FileCopyUtils.copyToByteArray(file), header, HttpStatus.OK);
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+		
+		return result;
 	}
 	
 	@PostMapping(value="/productfileinsert", produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
@@ -252,85 +256,29 @@ public class ProductController {
 		return result;
 	}
 	
-	@GetMapping("/productfiledetail") // 파일 하나만... 아마도
-	public ResponseEntity<byte[]> productfileDetail(@RequestParam(name="imgName") String imgName) {
-		logger.info("ProductController imagedetail " + imgName);
-		File file = new File("C:\\meaningFarm\\meaningFarm\\src\\main\\webapp\\resources\\image\\" + imgName);
-		ResponseEntity<byte[]> result = null;
-		try {
-			HttpHeaders header = new HttpHeaders();
-			header.add("Content-type", Files.probeContentType(file.toPath()));
-			result = new ResponseEntity<>(FileCopyUtils.copyToByteArray(file), header, HttpStatus.OK);
-		} catch (Exception e) {
-			e.printStackTrace();
-		}
-		
-		return result;
-	}
 	
-	@PostMapping("/productfiledelete")
-	public ResponseEntity<String> productfileDelete(@RequestParam(name="imgName") String imgName, ProductFileVO productfileVO) {
+	@PostMapping("/productfiledeleteone")
+	public ResponseEntity<String> productfileDeleteOne(@RequestParam(name="imgName") String imgName, @RequestParam(name="productfile_no")int productfile_no) {
 		
-		logger.info("ProductController productfileDelete " + imgName);
-		logger.info("ProductController productfileDelete " + productfileVO);
+		logger.info("ProductController productfileDeleteOne " + imgName);
+		logger.info("ProductController productfileDeleteOne " + productfile_no);
 		File file = null;
 		try {
 			// 썸네일 파일 삭제
 			System.out.println("썸네일 파일명 " + URLDecoder.decode(imgName, "UTF-8"));
 			file = new File("C:\\meaningFarm\\meaningFarm\\src\\main\\webapp\\resources\\image\\" + URLDecoder.decode(imgName, "UTF-8"));
-			boolean result = file.delete();
-			System.out.println("file delete 1 " + result);
+			file.delete();
 			// 원본 파일 삭제
 			String originImgName = file.getAbsolutePath().replaceFirst("s_", "");
 			logger.info("originImgName " + originImgName);
 			file = new File(originImgName);
-			result = file.delete();
-			System.out.println("file delete 2 " + result);
+			file.delete();
 		} catch (Exception e) {
 			e.printStackTrace();
 			return new ResponseEntity<String>("fail", HttpStatus.NOT_IMPLEMENTED);
 		}
-		productService.productfileDelete(productfileVO.getProductfile_no());
+		productService.productfileDeleteOne(productfile_no);
 		return new ResponseEntity<String>("success", HttpStatus.OK);
 	}
 	
-//	@PostMapping("productfileinsert")
-//	public String productfileInsert(ProductFileVO productfileVO, RedirectAttributes rttr) throws Exception {
-//		logger.info("ProductController productfileInsert " + productfileVO);
-//		productService.productfileInsert(productfileVO);
-//		return "";
-//	}
-	
-	
-//	@GetMapping("/productlisttest")
-//	public String selectProductPage(Model model, HttpServletRequest request, PageVO pageVO,
-//									@RequestParam(value="nowPage", required=false)String nowPage,
-//									@RequestParam(value="cntPerPage", required=false)String cntPerPage,
-//									@RequestParam(defaultValue="product_no", required=false)String searchType,
-//									@RequestParam(value="keyword", required=false)String keyword) {
-//		HttpSession session = request.getSession();
-//		String m_id = "1";
-//		session.setAttribute("m_id", m_id);
-//		
-//		SearchVO searchVO = new SearchVO();
-//		searchVO.setSearchType(searchType);
-//		searchVO.setKeyword(keyword);
-//		
-//		int total = productService.countProduct(searchVO);
-////		int total = productService.countProduct(m_id);
-//		if(nowPage == null && cntPerPage == null) {
-//			nowPage = "1";
-//			cntPerPage = "5";
-//		} else if(nowPage == null) {
-//			nowPage = "1";
-//		} else if(cntPerPage == null) {
-//			cntPerPage = "5";
-//		}
-//		pageVO = new PageVO(total, Integer.parseInt(nowPage), Integer.parseInt(cntPerPage), (String)session.getAttribute("m_id"));
-//		model.addAttribute("paging", pageVO);
-//		model.addAttribute("viewAll", productService.selectProductPage(searchVO));
-////		model.addAttribute("viewAll", productService.selectProductPage(pageVO));
-//		
-//		return "product/productlisttest";
-//	}
 }

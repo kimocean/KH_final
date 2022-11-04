@@ -38,7 +38,7 @@ table {
 <div id="pdContainer">
 <h1>상품 상세</h1>
 <form action="/mall/product/productdetail?product_no=${productSelectOne.product_no}" method="post" id="f_product"> <br/>
-<input type="hidden" name="product_no" value="${productSelectOne.product_no}">
+<input type="hidden" name="product_no" id="product_no" value="${productSelectOne.product_no}">
 <input type="text" class="form-control" name="product_name" value="${productSelectOne.product_name}" placeholder="상품명"> <br/>
 <select class="form-select" id="s_category_local_no" name="category_local_no" value="${productSelectOne.category_local_no}">
 	<option selected value="">카테고리-지역</option>
@@ -52,7 +52,6 @@ table {
 	<div class="form_section_content">
 		<input type="file" class="form-control" name="product_img" id="product_img" accept="image/*" multiple>
 		<div id="uploadResult">
-			<ul class="imgUL"></ul>
 		</div>
 	</div>
 </div>
@@ -184,13 +183,9 @@ let productForm = $("form[name='f_product']");
 	let product_no = '<c:out value="${productSelectOne.product_no}"/>';
 	let uploadResult = $("#uploadResult");
 	
-	let formData0 = new FormData();
-	
-	$.getJSON("productfilelist", {product_no : product_no}, function(obj) {
-		for(let i=0;i<obj.length;i++) {
-			formData0.append("uploadImg", obj[i]);
-		}
-		if(obj.length === 0) {
+	$.getJSON("productfilelist", {product_no : product_no}, function(arr) {
+		
+		if(arr.length === 0) {
 			let str = "";
 			str += "<div id='result_card'>";
 			str += "<img src='/resources/image/logo.png'>";
@@ -199,42 +194,34 @@ let productForm = $("form[name='f_product']");
 			uploadResult.html(str);
 			return;
 		}
-		
-		let str = "";
-		
-//		for(let i=0;i<obj.length;i++) {
-//			let fileCallPath = encodeURIComponent(obj[i].productfile_sname);
-//			str += "<div id='result_card[" + i + "]'";
-//			str += "data-path='" + obj[i].productfile_path + "' data-filename='" + obj[i].productfile_name + "'>";
-//			str += "<img src='productfiledetail?imgName=" + fileCallPath + "'>";
-//			str += "<div class='imgDeleteBtn[" + i + "]' data-file='" + fileCallPath + "'>x</div>";
-//			str += "<input type='hidden' name='productfileVO[" + i + "].productfile_name' value='"+ obj.productfile_name +"'>";
-//			str += "<input type='hidden' name='productfileVO[" + i + "].productfile_sname' value='"+ obj.productfile_sname +"'>";
-//			str += "<input type='hidden' name='productfileVO[" + i + "].productfile_path' value='"+ obj.productfile_path +"'>";
-//			str += "</div>"
-//			
-//			uploadResult.html(str);
-//		}
 
-		$(obj).each(function(i,obj) {
-			let fileCallPath = encodeURIComponent(obj.productfile_sname);
-			str += "<li style='cursor:pointer' class='imgLI' data-path='"+obj.productfile_path+"' data-name='"+obj.productfile_name+"'>";
-			str += "<span> " + obj.productfile_name + " </span>";
-			str += " <button type='button' class='imgDeleteBtn' data-no='"+obj.productfile_no
-					+ "' data-name='"+obj.productfile_name+"' data-type='image'>x</button>"
-			str += " <div>";
-			str += "<img src='productfiledetail?imgName=" + fileCallPath + "'>";
-			str += "</div>";
-			str += "</li>";
-		});
-		$("#uploadResult ul").html(str);
-	
+		let str = "";
+		let obj = arr[0];
+		
+		let fileCallPath = encodeURIComponent(obj.productfile_sname);
+		str += "<div id='result_card' data-name='" + obj.productfile_name + "' data-sname='" + obj.productfile_sname + "' data-path='" + obj.productfile_path + "'>";
+		str += "<img src='productfiledetail?imgName=" + fileCallPath + "'>";
+		str += "<div class='imgDeleteBtn' data-name='" + fileCallPath +"'>x</div>";
+		str += "</div>";
+		str += "<input type='hidden' id='productfile_no' name='productfileVO[0].productfile_no' value='"+ obj.productfile_no +"'>";
+		str += "<input type='hidden' name='productfileVO[0].productfile_name' value='"+ obj.productfile_name +"'>";
+		str += "<input type='hidden' name='productfileVO[0].productfile_sname' value='"+ obj.productfile_sname +"'>";
+		str += "<input type='hidden' name='productfileVO[0].productfile_path' value='"+ obj.productfile_path +"'>";
+		
+		uploadResult.html(str);
+		
+		
 	}) // end of getJSON
 	// 기존 이미지 출력 끝
 	
 	//이미지 업로드
-	let formData = new FormData();
 	$("input[type='file']").on("change", function(e) {
+		
+		if($(".imgDeleteBtn").length > 0) {
+			deleteImg();
+		}
+		
+		let formData = new FormData();
 		let img = $("input[name='product_img']");
 		let imgList = img[0].files;
 		let imgObj = imgList[0];
@@ -243,11 +230,8 @@ let productForm = $("form[name='f_product']");
 			console.log(imgObj.name, imgObj.size)
 			return false;
 		}
-		alert("통과");
 		
-		for(let i=0;i<imgList.length;i++) {
-			formData.append("uploadImg", imgList[i]);
-		}
+		formData.append("uploadImg", imgObj);
 	
 		$.ajax({
 			url: 'productfileinsert',
@@ -266,8 +250,6 @@ let productForm = $("form[name='f_product']");
 				alert("이미지 파일이 아닙니다.")
 			}
 		});
-		console.log(imgList);
-		console.log(imgObj);
 	}) // end of input type file change
 	
 	let regex = new RegExp("(.*?)\.(exe|sh|zip|alz)$"); // 파일 형식 제한
@@ -288,58 +270,61 @@ let productForm = $("form[name='f_product']");
 	// 이미지 출력
 	function showUploadImage(uploadResultArr) {
 		if(!uploadResultArr || uploadResultArr.length == 0) { alert("showUploadImage 오류"); return }
-		let uploadUL = $("#uploadResult UL");
-		let imsi = "";
-//		uploadResult.html(imsi);
+		let uploadResult = $("#uploadResult");
+		let obj = uploadResultArr[0];
 		let str = "";
-
-		$(uploadResultArr).each(function(i, obj) {
-//			if(obj.image) {
-				let fileCallPath = encodeURIComponent(obj.productfile_name);
-				str += "<li data-name='" + obj.productfile_name + "'>";
-				str += "<span>" + obj.productfile_name + "</span>";
-				str += "<button type='button' data-name='" + obj.productfile_name + "'>x</button><br>";
-				str += "<div>";
-				str += "<img src='productfiledetail?imgName=" + fileCallPath + "'>";
-				str += "</div> </li>";
-//			} else {
-//				console.log("여기인가?")
-//				let fileCallPath = encodeURIComponent(obj.productfile_name);
-//				let fileLink = fileCallPath.replace(new RegExp(/\\/g), "/");
-//				str += "<li style='cursor:pointer' data-name='" + obj.productfile_name+"'>";
-//				str += "<span>" + obj.productfile_name + "</span>";
-//				str += "<button type='button' data-name='" + obj.productfile_name + "'>x</button><br>";
-//				str += "<div>";
-//				str += "<img src='/resources/image/logo.png'>";
-//				str += "</div> </li>";
-//			}
-		})
+		let fileCallPath = encodeURIComponent(obj.productfile_name);
 		
-		uploadUL.append(str);
+		str += "<div id='result_card'>";
+		str += "<img src='productfiledetail?imgName=" + fileCallPath + "'>";
+		str += "<div class='imgDeleteBtn' data-name='" + fileCallPath +"'>x</div>";
+		str += "</div>"
+		str += "<input type='hidden' name='productfileVO[0].productfile_name' value='"+ obj.productfile_name +"'>";
+		str += "<input type='hidden' name='productfileVO[0].productfile_sname' value='"+ obj.productfile_sname +"'>";
+		str += "<input type='hidden' name='productfileVO[0].productfile_path' value='"+ obj.productfile_path +"'>";
+		
+		uploadResult.append(str);
 
 	} // end of showUpImage
 	
 	// 이미지 화면에서 삭제 시작
-	$("#uploadResult").on("click", "button", function(e) {
-		console.log("delete button");
-		let targetLi = $(this).closest("li");
-		let targetImg = targetLi.data("name");
+	$("#uploadResult").on("click", ".imgDeleteBtn", function(e) {
+		deleteImg();	
+	});
+	
+	
+	// 파일 삭제
+	function deleteImg() {
+		console.log("delete 실행")
 		
-		$.ajax({
-			url: 'productfiledelete',
-			data: { imgName : targetImg },
-			dataType: 'text',
-			type: 'POST',
-			success: function(result) {
-				console.log(result);
-				targetLi.remove();
-			},
-			error: function(result) {
-				console.log(result);
-				console.log("파일 삭제 불가");
-			}
-		})
-	})
+		let targetImg = $(".imgDeleteBtn").data("name");
+		let targetDiv = $("#result_card");
+		
+		let productfile_no = $("#productfile_no").val();
+		console.log(productfile_no)
+		let product_no = $("#product_no").val();
+		console.log(product_no)
+
+//		$.ajax({
+//			url: 'productfiledeleteone',
+//			data: {
+//				imgName : targetImg,
+//				productfile_no : productfile_no
+//				},
+//			dataType: 'text',
+//			type: 'POST',
+//			success: function(result) {
+//				console.log(result + " 삭제 완료");
+				targetDiv.remove();
+//				$("input[type='file']").val("");
+//			},
+//			error: function(error) {
+//				console.log(error);
+//				alert("파일 삭제 실패");
+//			}
+//		})
+	}
+		
 	// 이미지 화면에서 삭제 끝
 	
 	

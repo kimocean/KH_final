@@ -123,11 +123,15 @@ $(document).ready(function() {
 }); // end of document ready
 
 	//이미지 업로드
-	let formData = new FormData();
 	$("input[type='file']").on("change", function(e) {
 		
-		let img = $("input[name='product_img']");
-		let imgList = img[0].files;
+		if($(".imgDeleteBtn").length > 0) {
+			deleteImg();
+		}
+		
+		let formData = new FormData();
+		let imgInput = $("input[name='product_img']");
+		let imgList = imgInput[0].files;
 		let imgObj = imgList[0];
 		
 		if(!imgCheck(imgObj.name, imgObj.size)) {
@@ -157,8 +161,6 @@ $(document).ready(function() {
 				alert("이미지 파일이 아닙니다.")
 			}
 		});
-		console.log(imgList);
-		console.log(imgObj);
 	}) // end of input type file change
 	
 	let maxSize = 10485760000; // 파일 용량 제한
@@ -175,29 +177,34 @@ $(document).ready(function() {
 	function showUploadImage(uploadResultArr) {
 		if(!uploadResultArr || uploadResultArr.length == 0) { alert("showUploadImage 오류"); return }
 		let uploadResult = $("#uploadResult");
-		let imsi = "";
-		uploadResult.html(imsi);
-		for(let i=0;i<uploadResultArr.length;i++) {
-			let obj = uploadResultArr[i];
-			let str = "";
+		let obj = uploadResultArr[0];
+		let str = "";
+		let fileCallPath = obj.productfile_sname;
+
+		str += "<div id='result_card'>";
+		str += "<img src='productfiledetail?imgName=" + fileCallPath + "'>";
+		str += "<div class='imgDeleteBtn' data-name='" + fileCallPath +"'>x</div>";
+		str += "</div>"
+		str += "<input type='hidden' name='productfileVO[0].productfile_name' value='"+ obj.productfile_name +"'>";
+		str += "<input type='hidden' name='productfileVO[0].productfile_sname' value='"+ obj.productfile_sname +"'>";
+		str += "<input type='hidden' name='productfileVO[0].productfile_path' value='"+ obj.productfile_path +"'>";
+		
+		uploadResult.append(str);
+		
+//		let imsi = "";
+//		uploadResult.html(imsi);
+//		for(let i=0;i<uploadResultArr.length;i++) {
+//			let obj = uploadResultArr[i];
+//			let str = "";
 //			let imsi = obj.productfile_path.replace(/\\/g, '/').indexOf('20');
 //			let imsi2 = obj.productfile_path.replace(/\\/g, '/').slice(imsi);
 //			let fileCallPath = "s_" + obj.productfile_name;
-			let fileCallPath = obj.productfile_sname;
+//			let fileCallPath = obj.productfile_sname;
 		//	let fileCallPath = obj.productfile_path.replace(/\\/g, '/') + "/s_" + obj.productfile_name;
-			console.log(fileCallPath)
+//			console.log(fileCallPath)
 			
-			str += "<div id='result_card'>";
-			str += "<img src='productfiledetail?imgName=" + fileCallPath + "'>";
-		//	str += "<img src='/mall/" + fileCallPath + "'>";
-			str += "<div class='imgDeleteBtn' data-file='" + fileCallPath + "'>x</div>";
-			str += "<input type='hidden' name='productfileVO[" + i + "].productfile_name' value='"+ obj.productfile_name +"'>";
-			str += "<input type='hidden' name='productfileVO[" + i + "].productfile_sname' value='"+ obj.productfile_sname +"'>";
-			str += "<input type='hidden' name='productfileVO[" + i + "].productfile_path' value='"+ obj.productfile_path +"'>";
-			str += "</div>"
 			
-			uploadResult.append(str);
-		} // end for for
+//		} // end for for
 		
 	}
 	
@@ -208,17 +215,20 @@ $(document).ready(function() {
 	
 	// 파일 삭제
 	function deleteImg() {
-		let targetImg = $(".imgDeleteBtn").data("file");
+		let targetImg = $(".imgDeleteBtn").data("name");
 		let targetDiv = $("#result_card");
 		
+		console.log(targetImg);
+		console.log(targetDiv)
+		
 		$.ajax({
-			url: 'productfiledelete',
+			url: 'productfiledeleteone',
 			data: {imgName : targetImg},
 			dataType: 'text',
 			type: 'POST',
 			success: function(result) {
 				console.log(result + " 삭제 완료");
-				targetDiv.remove()
+				targetDiv.remove();
 				$("input[type='file']").val("");
 			},
 			error: function(error) {

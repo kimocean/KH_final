@@ -80,6 +80,11 @@ public class ProductDAO {
 		sst.delete("productfileDelete", product_no);
 	}
 	
+	public void productfileDeleteOne(int product_no) {
+		logger.info("ProductService productfileDeleteOne " + product_no);
+		sst.delete("productfileDeleteOne", product_no);
+	}
+	
 	// 게시물 목록 조회
 	public List<ProductVO> list(SearchVO searchVO) {
 		return sst.selectList("listPage", searchVO);
